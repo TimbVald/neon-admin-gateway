@@ -19,13 +19,23 @@ import UserTable from '../components/UserTable';
 import ActivityChart from '../components/ActivityChart';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/login');
   };
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="glass-card p-8 rounded-xl">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background cyber-grid">
@@ -45,10 +55,10 @@ const Dashboard = () => {
             
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">{user?.name}</p>
+                <p className="text-sm font-medium text-white">{profile.full_name || user?.email}</p>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="bg-green-900/30 text-green-300 border-green-500/30">
-                    {user?.role}
+                    {profile.role}
                   </Badge>
                 </div>
               </div>
@@ -72,7 +82,7 @@ const Dashboard = () => {
           {/* Welcome Section */}
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold neon-text">
-              Bienvenue, {user?.name}
+              Bienvenue, {profile.full_name || user?.email}
             </h2>
             <p className="text-gray-300">
               Gérez votre application depuis ce tableau de bord sécurisé

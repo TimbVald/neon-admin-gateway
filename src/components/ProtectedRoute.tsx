@@ -9,24 +9,24 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { user, isLoading } = useAuth();
+  const { user, profile, isLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isLoading) {
-      if (!user) {
+      if (!user || !profile) {
         console.log('Utilisateur non connecté, redirection vers /login');
         navigate('/login');
         return;
       }
 
-      if (requiredRole && user.role !== requiredRole) {
-        console.log(`Accès refusé: rôle requis "${requiredRole}", rôle utilisateur "${user.role}"`);
+      if (requiredRole && profile.role !== requiredRole) {
+        console.log(`Accès refusé: rôle requis "${requiredRole}", rôle utilisateur "${profile.role}"`);
         navigate('/login');
         return;
       }
     }
-  }, [user, isLoading, navigate, requiredRole]);
+  }, [user, profile, isLoading, navigate, requiredRole]);
 
   if (isLoading) {
     return (
@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     );
   }
 
-  if (!user || (requiredRole && user.role !== requiredRole)) {
+  if (!user || !profile || (requiredRole && profile.role !== requiredRole)) {
     return null;
   }
 
